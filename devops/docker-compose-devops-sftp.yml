@@ -1,0 +1,42 @@
+version: '3.1'
+
+services:
+
+  svc-sftp:
+    image: atmoz/sftp:debian-jessie
+    volumes:
+      - vol-sftp-data:/home
+      - vol-sftp-users-conf:/etc/sftp:ro
+    ports:
+      - "2222:22"
+    networks:
+      - net-sftp
+
+volumes:
+  vol-sftp-data:
+    driver: rexray/azureud
+    driver_opts:
+      share: vol-sftp-data
+      gid: 0
+      uid: 0
+      perfmode: maxio      
+      filemode: 0755
+      dirmode: 0755
+      size: 50      
+
+  vol-sftp-users-conf:
+    driver: 'cloudstor:azure'
+    driver_opts:
+      share: vol-sftp-users-conf
+      gid: 1001
+      uid: 1001
+      perfmode: maxio      
+      filemode: 0777
+      dirmode: 0777
+      size: 1      
+
+networks:
+  net-sftp:
+    driver: overlay
+  
+

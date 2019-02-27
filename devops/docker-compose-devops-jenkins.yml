@@ -1,0 +1,29 @@
+version: '3.1'
+
+services:
+  svc-jenkins-app:
+    image: jenkins/jenkins:lts
+    ports:
+      - '8080:8080'
+      - '50000:50000'
+    volumes:
+      - vol-jenkins-app-data:/var/jenkins_home
+    networks:
+      - net-jenkins
+
+volumes:
+  vol-jenkins-app-data:
+    driver: cloudstor:azure
+    driver_opts:
+      share: vol-jenkins-app-data
+      gid: 1000
+      uid: 1000
+      perfmode: maxio      
+      filemode: 0777
+      dirmode: 0777
+      size: 10  
+
+networks:
+  net-jenkins:
+    driver: overlay 
+

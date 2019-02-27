@@ -1,0 +1,57 @@
+version: '3.1'
+
+services:
+
+  sftp:
+    image: atmoz/sftp:debian-jessie
+    volumes:
+      - sftp-data:/home
+      - sftp-users-conf:/etc/sftp:ro
+    ports:
+        - "2222:22"
+
+volumes:
+  sftp-data:
+    driver: rexray/azureud
+    driver_opts:
+      share: sftp-data
+      gid: 0
+      uid: 0
+      perfmode: maxio      
+      filemode: 0755
+      dirmode: 0755
+      size: 50      
+
+  sftp-users-conf:
+    driver: 'cloudstor:azure'
+    driver_opts:
+      share: sftp-users-conf
+      gid: 1001
+      uid: 1001
+      perfmode: maxio      
+      filemode: 0777
+      dirmode: 0777
+      size: 1      
+
+  sftp-ssh-host-ed25519-key:
+    driver: 'cloudstor:azure'
+    driver_opts:
+      share: sftp-ssh-host-ed25519-key
+      gid: 1001
+      uid: 1001
+      perfmode: maxio      
+      filemode: 0777
+      dirmode: 0777
+      size: 1      
+
+  sftp-ssh-host-rsa-key:
+    driver: 'cloudstor:azure'
+    driver_opts:
+      share: sftp-ssh-host-rsa-key
+      gid: 1001
+      uid: 1001
+      perfmode: maxio      
+      filemode: 0777
+      dirmode: 0777
+      size: 1      
+

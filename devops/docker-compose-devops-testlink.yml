@@ -1,0 +1,75 @@
+version: '3.1'
+
+services:
+  svc-testlink-database:
+    image: 'mariadb:10.3.5'
+
+    environment:
+      - MYSQL_DATABASE=testlink
+      - MYSQL_ROOT_PASSWORD=ExtraStores777      
+      - MYSQL_USER=testlinkdbadmin
+      - MYSQL_PASSWORD=ExtraStores777
+    volumes:
+      - vol-testlink-db-data:/var/lib/mysql
+    networks:
+      - net-testlink
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    ports: 
+      - '3306:3306'
+      
+  svc-testlink-app:
+    image: 'bitnami/testlink:1.9.17'
+    ports:
+      - '80:80'
+      - '443:443'
+    volumes:
+      - vol-testlink-app-data:/bitnami
+    depends_on:
+      - svc-testlink-database
+    environment:
+      - MARIADB_HOST=svc-testlink-database
+      - MARIADB_PORT_NUMBER=3306
+      - ALLOW_EMPTY_PASSWORD=no
+      - TESTLINK_DATABASE_NAME=testlink
+      - TESTLINK_DATABASE_USER=testlinkdbadmin
+      - TESTLINK_DATABASE_PASSWORD=ExtraStores777
+      - TESTLINK_USERNAME=testlinkadmin
+      - TESTLINK_PASSWORD=ExtraStores777
+      - TESTLINK_EMAIL=ecom.devops@extra.com
+    deploy:
+      replicas: 1
+    networks:
+      - net-testlink
+      
+volumes:
+  vol-testlink-db-data:
+    driver: rexray/azureud
+    driver_opts:
+      share: vol-testlink-db-data
+      gid: 1001
+      uid: 1001
+      perfmode: maxio      
+      filemode: 0777
+      dirmode: 0777
+      size: 50      
+
+  vol-testlink-app-data:
+    driver: 'cloudstor:azure'
+    driver_opts:
+      share: vol-testlink-app-data
+      gid: 1001
+      uid: 1001
+      perfmode: maxio      
+      filemode: 0777
+      dirmode: 0777
+      size: 10  
+
+networks:
+  net-testlink:
+    driver: overlay
+
